@@ -7,11 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aliahmed1973.udemyedu.CourseApp
 import com.aliahmed1973.udemyedu.databinding.CoursesFragmentBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 private const val TAG = "CoursesFragment"
 
@@ -21,6 +25,7 @@ class CoursesFragment : Fragment() {
     private val coursesViewModel: CoursesViewModel by viewModels {
         CoursesViewModel.Factory((requireContext().applicationContext as CourseApp).repository)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,38 +38,28 @@ class CoursesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(binding.rvCourses)
-        {
-            adapter = CoursesAdapter(CoursesAdapter.CourseClickListener {
-                findNavController().navigate(
-                    CoursesFragmentDirections.actionCoursesFragmentToCourseDetailsFragment(
-                        it
-                    )
+        val adapter = CoursesAdapter(CoursesAdapter.CourseClickListener {
+            findNavController().navigate(
+                CoursesFragmentDirections.actionCoursesFragmentToCourseDetailsFragment(
+                    it
                 )
-            })
-            setHasFixedSize(true)
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-                    if (dy > 0) {
-                        val layoutmanger: LinearLayoutManager =
-                            recyclerView.layoutManager as LinearLayoutManager
-                        val visiblePos = layoutmanger.findLastVisibleItemPosition()
-                        val numItems = recyclerView.adapter?.itemCount
-                        if (visiblePos >= numItems!! - 1) {
-                            Log.d(TAG, "onScrolled: " + "yessss")
-                            //  coursesViewModel.addNum()
-                        }
+            )
+        })
 
-                    }
+       binding.apply {
+           rvCourses.setHasFixedSize(true)
+           rvCourses.adapter=adapter
+       }
 
+
+        lifecycleScope.launch {
+            coursesViewModel.courses.flowWithLifecycle(lifecycle,Lifecycle.State.STARTED)
+                .collectLatest{
+                    adapter.submitData(it)
+                    Log.d(TAG, "onViewCreated: ${it}")
                 }
-            })
         }
-//        coursesViewModel.pageNum.observe(viewLifecycleOwner){
-//            Log.d(TAG, "onViewCreated: pageNum"+"$it")
-//        //    coursesViewModel.getCoursesList(it)
-//        }
+
     }
 
     override fun onDestroyView() {

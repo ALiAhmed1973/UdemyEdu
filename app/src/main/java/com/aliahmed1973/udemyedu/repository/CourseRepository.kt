@@ -1,6 +1,12 @@
 package com.aliahmed1973.udemyedu.repository
 
 import android.util.Log
+import androidx.lifecycle.asLiveData
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
+import com.aliahmed1973.udemyedu.CoursePagingSource
 import com.aliahmed1973.udemyedu.database.*
 import com.aliahmed1973.udemyedu.model.Course
 import com.aliahmed1973.udemyedu.model.CourseNote
@@ -11,6 +17,7 @@ import com.aliahmed1973.udemyedu.network.asReviewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -18,18 +25,15 @@ private const val TAG = "CourseRepository"
 class CourseRepository(private val courseDao: CourseDao,
                        private val service:Service,
 private val ioDispatcher : CoroutineDispatcher = Dispatchers.IO) {
-    var count =0
-    suspend fun getCoursesFromServer(page:Int):List<Course>
+
+     fun getCoursesFromServer():Flow<PagingData<Course>>
     {
-        return try {
-          val networkresponse=  service.getCourses(page)
-            count= networkresponse.count
-            networkresponse.asCourseModel()
-        }catch (e:Exception)
-        {
-            Log.e(TAG, "getCoursesFromServer: "+e.message )
-            emptyList()
-        }
+         val pager =Pager(config = PagingConfig(pageSize = NETWORK_PAGE_SIZE, maxSize = 100, enablePlaceholders = false),
+        pagingSourceFactory = {CoursePagingSource(service)}).flow
+
+
+//        Log.d(TAG, "getCoursesFromServer: ${}")
+        return pager
     }
 
     suspend fun getCourseReviewFromServer(courseId:Int):List<Review>
@@ -145,5 +149,9 @@ private val ioDispatcher : CoroutineDispatcher = Dispatchers.IO) {
                 Log.e(TAG, "deleteNoteFromList: ${e.message}")
             }
         }
+    }
+
+    companion object {
+        const val NETWORK_PAGE_SIZE = 30
     }
 }

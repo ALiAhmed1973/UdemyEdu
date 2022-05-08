@@ -12,7 +12,7 @@ data class NetworkCourseInstructor(
     @Json(name = "display_name")
     val name: String,
     @Json(name = "job_title")
-    val jopTitle: String,
+    val jopTitle: String?,
     @Json(name = "image_100x100")
     val instructorImage: String,
     @Json(name = "url")
@@ -44,7 +44,7 @@ data class NetworkCourse(
 fun NetworkCoursesContainer.asCourseModel(): List<Course> {
     return courses.map {
        val courseInstructor= it.instructor.map {
-           CourseInstructor(name = it.name, jopTitle = it.jopTitle, instructorImage = it.instructorImage, url = it.url)
+           CourseInstructor(name = it.name, jopTitle = it.jopTitle?:"", instructorImage = it.instructorImage, url = it.url)
        }
         Course(
             id = it.id, title = it.title, url = it.url,

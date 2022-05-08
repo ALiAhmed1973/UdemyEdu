@@ -9,11 +9,11 @@ import com.aliahmed1973.udemyedu.courses.CoursesAdapter
 import com.aliahmed1973.udemyedu.model.Course
 import com.aliahmed1973.udemyedu.model.Review
 
-@BindingAdapter("listData")
-fun bindRecyclerView(recyclerView: RecyclerView, data: List<Course>?) {
-    val adapter = recyclerView.adapter as CoursesAdapter
-    adapter.submitList(data)
-}
+//@BindingAdapter("listData")
+//fun bindRecyclerView(recyclerView: RecyclerView, data: List<Course>?) {
+//    val adapter = recyclerView.adapter as CoursesAdapter
+//    adapter.submitData(data)
+//}
 
 @BindingAdapter("listReviewData")
 fun bindReviewRecyclerView(recyclerView: RecyclerView, data: List<Review>?) {
