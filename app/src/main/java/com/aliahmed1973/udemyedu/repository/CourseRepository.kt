@@ -1,27 +1,28 @@
 package com.aliahmed1973.udemyedu.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import com.aliahmed1973.udemyedu.database.*
 import com.aliahmed1973.udemyedu.model.Course
 import com.aliahmed1973.udemyedu.model.CourseNote
 import com.aliahmed1973.udemyedu.model.Review
-import com.aliahmed1973.udemyedu.network.CourseApi
+import com.aliahmed1973.udemyedu.network.Service
 import com.aliahmed1973.udemyedu.network.asCourseModel
 import com.aliahmed1973.udemyedu.network.asReviewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 private const val TAG = "CourseRepository"
-class CourseRepository(private val database: CourseDatabase) {
+class CourseRepository(private val courseDao: CourseDao,
+                       private val service:Service,
+private val ioDispatcher : CoroutineDispatcher = Dispatchers.IO) {
     var count =0
     suspend fun getCoursesFromServer(page:Int):List<Course>
     {
         return try {
-          val networkresponse=  CourseApi.service.getCourses(page)
+          val networkresponse=  service.getCourses(page)
             count= networkresponse.count
             networkresponse.asCourseModel()
         }catch (e:Exception)
@@ -34,7 +35,7 @@ class CourseRepository(private val database: CourseDatabase) {
     suspend fun getCourseReviewFromServer(courseId:Int):List<Review>
     {
         return try {
-            val networkResponse = CourseApi.service.getReviews(courseId)
+            val networkResponse = service.getReviews(courseId)
             Log.d(TAG, "getCourseReviewFromServer: "+"${networkResponse}")
             networkResponse.asReviewModel()
         }catch (e:Exception)
@@ -45,11 +46,11 @@ class CourseRepository(private val database: CourseDatabase) {
     }
 
     suspend fun insertCourseToMylist(course: Course) {
-        withContext(Dispatchers.IO)
+        withContext(ioDispatcher)
         {
             try {
-                database.courseDao.insertCourse(course.asDatabaseCourse())
-                database.courseDao.insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
+                courseDao.insertCourse(course.asDatabaseCourse())
+                courseDao.insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
             } catch (e: Exception) {
                 Log.e(TAG, "insertCourseToMylist: ${e.message}")
             }
@@ -58,10 +59,10 @@ class CourseRepository(private val database: CourseDatabase) {
     }
 
     suspend fun insertCourseInstructorToMylist(course: Course) {
-        withContext(Dispatchers.IO)
+        withContext(ioDispatcher)
         {
             try {
-                database.courseDao.insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
+                courseDao.insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
             } catch (e: Exception) {
                 Log.e(TAG, "insertCourseInstructorToMylist: ${e.message}")
             }
@@ -71,10 +72,10 @@ class CourseRepository(private val database: CourseDatabase) {
 
     suspend fun insertNoteToMylistCourse(courseNote: CourseNote, courseId:Int)
     {
-        withContext(Dispatchers.IO)
+        withContext(ioDispatcher)
         {
             try {
-                database.courseDao.insertCourseNote(courseNote.asDBNote(courseId))
+                courseDao.insertCourseNote(courseNote.asDBNote(courseId))
             }catch (e: Exception) {
                 Log.e(TAG, "insertNotesToCourse: ${e.message}")
             }
@@ -82,10 +83,10 @@ class CourseRepository(private val database: CourseDatabase) {
     }
 
     suspend fun UpdateOldNote(courseNote: CourseNote, courseId: Int) {
-        withContext(Dispatchers.IO)
+        withContext(ioDispatcher)
         {
             try {
-                database.courseDao.updateCourseNote(courseNote.asDBNote(courseId))
+                courseDao.updateCourseNote(courseNote.asDBNote(courseId))
             }catch (e: Exception) {
                 Log.e(TAG, "insertNotesToCourse: ${e.message}")
             }
@@ -94,21 +95,21 @@ class CourseRepository(private val database: CourseDatabase) {
 
     fun getMyCourseslist():Flow<List<Course>>
     {
-        return database.courseDao.getCourses().map {
+        return courseDao.getCourses().map {
             it.asCourseModel()
         }
     }
 
     fun getMyCourseById(id:Int):Flow<Course?>
     {
-        return database.courseDao.getCourseByID(id).map {
+        return courseDao.getCourseByID(id).map {
             it?.asCourseModel()
         }
     }
 
     fun getNotesById(id:Int):Flow<List<CourseNote?>?>
     {
-        return database.courseDao.getNotesByCourseId(id).map{
+        return courseDao.getNotesByCourseId(id).map{
             it.asNotesModel()
         }
     }
@@ -117,14 +118,14 @@ class CourseRepository(private val database: CourseDatabase) {
 
     suspend fun deleteCourseFromList(course: Course)
     {
-        withContext(Dispatchers.IO)
+        withContext(ioDispatcher)
         {
             try {
-                database.courseDao.deleteCourse(course.asDatabaseCourse())
-                database.courseDao.deleteCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
+                courseDao.deleteCourse(course.asDatabaseCourse())
+                courseDao.deleteCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
                 course.courseNote?.asDBNotes(course.id)
                     ?.let {
-                        database.courseDao.deleteCourseNotes(it) }
+                        courseDao.deleteCourseNotes(it) }
             }catch (e:Exception)
             {
                 Log.e(TAG, "deleteCourseFromList: ${e.message}")
@@ -135,10 +136,10 @@ class CourseRepository(private val database: CourseDatabase) {
 
     suspend fun deleteNoteFromList(courseNote: CourseNote,courseId: Int)
     {
-        withContext(Dispatchers.IO)
+        withContext(ioDispatcher)
         {
             try {
-                database.courseDao.deleteCourseNote(courseNote.asDBNote(courseId))
+                courseDao.deleteCourseNote(courseNote.asDBNote(courseId))
             }catch (e:Exception)
             {
                 Log.e(TAG, "deleteNoteFromList: ${e.message}")

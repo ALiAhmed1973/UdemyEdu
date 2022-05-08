@@ -45,23 +45,30 @@ interface CourseDao{
     fun deleteCourseNote(Note: DatabaseCourseNote)
 }
 
-@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class],version=1)
+@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class],version=1, exportSchema = false)
 abstract class CourseDatabase:RoomDatabase(){
-    abstract val courseDao:CourseDao
-}
+    abstract fun courseDao():CourseDao
 
-private lateinit var INSTANCE: CourseDatabase
+    companion object{
+        @Volatile
+        private  var INSTANCE: CourseDatabase? =null
 
-fun getDatabase(context: Context): CourseDatabase {
-    if (!::INSTANCE.isInitialized) {
-        synchronized(CourseDatabase::class.java)
-        {
-            INSTANCE = Room.databaseBuilder(
-                context.applicationContext,
-                CourseDatabase::class.java,
-                "courses"
-            ).build()
+        fun getDatabase(context: Context): CourseDatabase {
+            return INSTANCE ?: synchronized(this)
+                {
+                    val instance = Room.databaseBuilder(
+                        context,
+                        CourseDatabase::class.java,
+                        "courses"
+                    ).build()
+                    INSTANCE=instance
+                    instance
+                }
+
         }
+
     }
-    return INSTANCE
 }
+
+
+
