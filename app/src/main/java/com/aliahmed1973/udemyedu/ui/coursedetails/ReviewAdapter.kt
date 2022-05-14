@@ -1,4 +1,4 @@
-package com.aliahmed1973.udemyedu.coursedetails
+package com.aliahmed1973.udemyedu.ui.coursedetails
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

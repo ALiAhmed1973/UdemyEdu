@@ -1,4 +1,4 @@
-package com.aliahmed1973.udemyedu.courses
+package com.aliahmed1973.udemyedu.ui.courses
 
 import android.os.Bundle
 import android.util.Log
@@ -7,11 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.map
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.aliahmed1973.udemyedu.CourseApp
 import com.aliahmed1973.udemyedu.databinding.CoursesFragmentBinding
 import kotlinx.coroutines.flow.collectLatest
@@ -32,7 +31,6 @@ class CoursesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = CoursesFragmentBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this
         binding.viewModel = this.coursesViewModel
         return binding.root
     }
@@ -46,15 +44,15 @@ class CoursesFragment : Fragment() {
             )
         })
 
-       binding.apply {
-           rvCourses.setHasFixedSize(true)
-           rvCourses.adapter=adapter
-       }
+        binding.apply {
+            rvCourses.setHasFixedSize(true)
+            rvCourses.adapter = adapter
+        }
 
 
         lifecycleScope.launch {
-            coursesViewModel.courses.flowWithLifecycle(lifecycle,Lifecycle.State.STARTED)
-                .collectLatest{
+            coursesViewModel.courses.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
                     adapter.submitData(it)
                     Log.d(TAG, "onViewCreated: ${it}")
                 }

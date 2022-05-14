@@ -4,9 +4,7 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.aliahmed1973.udemyedu.coursedetails.ReviewAdapter
-import com.aliahmed1973.udemyedu.courses.CoursesAdapter
-import com.aliahmed1973.udemyedu.model.Course
+import com.aliahmed1973.udemyedu.ui.coursedetails.ReviewAdapter
 import com.aliahmed1973.udemyedu.model.Review
 
 //@BindingAdapter("listData")
@@ -15,14 +13,14 @@ import com.aliahmed1973.udemyedu.model.Review
 //    adapter.submitData(data)
 //}
 
-@BindingAdapter("listReviewData")
-fun bindReviewRecyclerView(recyclerView: RecyclerView, data: List<Review>?) {
-    val adapter = recyclerView.adapter as ReviewAdapter
-    adapter.submitList(data)
-}
+//@BindingAdapter("listReviewData")
+//fun bindReviewRecyclerView(recyclerView: RecyclerView, data: List<Review>?) {
+//    val adapter = recyclerView.adapter as ReviewAdapter
+//    data.let { adapter.submitList(data) }
+//}
 
 @BindingAdapter("imgUrl")
-fun bindImage(imageView: ImageView,imgUrl:String)
+fun bindImage(imageView: ImageView,imgUrl:String?)
 {
     imageView.load(imgUrl)
 }

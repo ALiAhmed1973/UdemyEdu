@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/coursesFragment"
-        android:name="com.aliahmed1973.udemyedu.courses.CoursesFragment"
+        android:name="com.aliahmed1973.udemyedu.ui.courses.CoursesFragment"
         android:label="courses_fragment"
         tools:layout="@layout/courses_fragment" >
         <action
@@ -16,15 +16,16 @@
     </fragment>
     <fragment
         android:id="@+id/courseDetailsFragment"
-        android:name="com.aliahmed1973.udemyedu.coursedetails.CourseDetailsFragment"
-        android:label="CourseDetailsFragment" >
+        android:name="com.aliahmed1973.udemyedu.ui.coursedetails.CourseDetailsFragment"
+        android:label="CourseDetailsFragment"
+        tools:layout="@layout/course_details_fragment">
         <argument
             android:name="courseDetails"
             app:argType="com.aliahmed1973.udemyedu.model.Course" />
     </fragment>
     <fragment
         android:id="@+id/myCoursesListFragment"
-        android:name="com.aliahmed1973.udemyedu.mylist.MyCoursesListFragment"
+        android:name="com.aliahmed1973.udemyedu.ui.mylist.MyCoursesListFragment"
         android:label="my_courses_list_fragment"
         tools:layout="@layout/my_courses_list_fragment" >
         <action
@@ -33,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/myListCourseDetailsFragment"
-        android:name="com.aliahmed1973.udemyedu.mylistcoursedetails.MyListCourseDetailsFragment"
+        android:name="com.aliahmed1973.udemyedu.ui.mylistcoursedetails.MyListCourseDetailsFragment"
         android:label="my_list_course_details_fragment"
         tools:layout="@layout/my_list_course_details_fragment" >
         <argument

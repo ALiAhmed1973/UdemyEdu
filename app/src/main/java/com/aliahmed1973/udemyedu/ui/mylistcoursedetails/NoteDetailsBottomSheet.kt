@@ -1,4 +1,4 @@
-package com.aliahmed1973.udemyedu.mylistcoursedetails
+package com.aliahmed1973.udemyedu.ui.mylistcoursedetails
 
 import android.os.Bundle
 import android.util.Log

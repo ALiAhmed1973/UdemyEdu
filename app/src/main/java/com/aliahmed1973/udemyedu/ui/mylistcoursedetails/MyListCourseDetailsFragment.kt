@@ -1,4 +1,4 @@
-package com.aliahmed1973.udemyedu.mylistcoursedetails
+package com.aliahmed1973.udemyedu.ui.mylistcoursedetails
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,7 +26,7 @@ class MyListCourseDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = MyListCourseDetailsFragmentBinding.inflate(inflater)
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner=this
         binding.viewModel = viewModel
         adapter = MyListCourseDetailsAdapter()
         binding.rvCourseNotes.adapter = adapter

@@ -1,9 +1,9 @@
 package com.aliahmed1973.udemyedu
 
 import android.app.Application
+import com.aliahmed1973.udemyedu.data.CourseRepository
 import com.aliahmed1973.udemyedu.database.CourseDatabase
 import com.aliahmed1973.udemyedu.network.CourseApi
-import com.aliahmed1973.udemyedu.repository.CourseRepository
 
 class CourseApp:Application() {
 

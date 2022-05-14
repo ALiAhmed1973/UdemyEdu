@@ -1,13 +1,10 @@
-package com.aliahmed1973.udemyedu.courses
+package com.aliahmed1973.udemyedu.ui.courses
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.aliahmed1973.udemyedu.databinding.CourseItemBinding
 import com.aliahmed1973.udemyedu.model.Course
 
@@ -50,7 +47,6 @@ class CoursesAdapter(val courseClickListener:CourseClickListener):PagingDataAdap
 
     override fun onBindViewHolder(holder: CoursesAdapter.CourseViewHolder, position: Int) {
         val course = getItem(position)
-        Log.d(TAG, "onBindViewHolder: $course")
         course?.let { holder.bind(it) }
     }
 

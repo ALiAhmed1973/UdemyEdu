@@ -6,13 +6,13 @@
     <data>
         <variable
             name="viewModel"
-            type="com.aliahmed1973.udemyedu.coursedetails.CourseDetailsViewModel" />
+            type="com.aliahmed1973.udemyedu.ui.coursedetails.CourseDetailsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".coursedetails.CourseDetailsFragment">
+        tools:context=".ui.coursedetails.CourseDetailsFragment">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imageView_course"
@@ -118,7 +118,6 @@
             android:layout_height="0dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/review_item"
-            listReviewData="@{viewModel.courseReview}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
