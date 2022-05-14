@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/coursesFragment"
+        android:id="@+id/navigation1"
         android:title="@string/home_text"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_home_24"
         />
     <item
-        android:id="@+id/myCoursesListFragment"
+        android:id="@+id/navigation2"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_bookmark_24"
         android:title="@string/my_list_text" />
