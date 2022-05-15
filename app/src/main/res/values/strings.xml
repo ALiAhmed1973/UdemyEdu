@@ -4,4 +4,5 @@
     <string name="my_list_text">My list</string>
     <string name="results_could_not_be_loaded">Results could not be loaded</string>
     <string name="retry">Retry</string>
+    <string name="no_results">No Result</string>
 </resources>

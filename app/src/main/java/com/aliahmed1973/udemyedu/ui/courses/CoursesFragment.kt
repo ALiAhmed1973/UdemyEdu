@@ -5,12 +5,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.aliahmed1973.udemyedu.CourseApp
 import com.aliahmed1973.udemyedu.databinding.CoursesFragmentBinding
 import com.aliahmed1973.udemyedu.ui.CoursesLoadStateAdapter
@@ -49,11 +51,35 @@ class CoursesFragment : Fragment() {
         binding.apply {
             rvCourses.setHasFixedSize(true)
             rvCourses.adapter = adapter.withLoadStateHeaderAndFooter(
-                header = CoursesLoadStateAdapter{adapter.retry()},
-                footer = CoursesLoadStateAdapter{adapter.retry()}
+                header = CoursesLoadStateAdapter { adapter.retry() },
+                footer = CoursesLoadStateAdapter { adapter.retry() }
             )
+
+            retryButton.setOnClickListener {
+                adapter.retry()
+            }
         }
 
+        adapter.addLoadStateListener {
+            loadState->
+            binding.apply {
+                progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                rvCourses.isVisible = loadState.source.refresh is LoadState.NotLoading
+                retryButton.isVisible = loadState.source.refresh is LoadState.Error
+
+                if(loadState.source.refresh is LoadState.NotLoading &&
+                    loadState.append.endOfPaginationReached &&
+                    adapter.itemCount < 1)
+                {
+                    rvCourses.isVisible=false
+                    emptyList.isVisible=true
+                }else
+                {
+                    emptyList.isVisible=false
+                }
+
+            }
+        }
 
         lifecycleScope.launch {
             coursesViewModel.courses.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
