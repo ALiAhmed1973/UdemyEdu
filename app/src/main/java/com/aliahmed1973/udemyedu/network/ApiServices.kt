@@ -22,7 +22,7 @@ interface Service{
         "Authorization: Basic "+BuildConfig.Authorization_Key,
         "Content-Type: application/json;charset=utf-8")
     @GET("courses")
-   suspend fun getCourses(@Query("page") page:Int):NetworkCoursesContainer
+   suspend fun getCourses(@Query("page") page:Int,@Query("page_size") pageSize:Int):NetworkCoursesContainer
 
     @Headers("Accept: application/json, text/plain, */*",
         "Authorization: Basic "+BuildConfig.Authorization_Key,

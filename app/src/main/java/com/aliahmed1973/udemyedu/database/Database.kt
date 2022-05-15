@@ -4,19 +4,20 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.aliahmed1973.udemyedu.model.Course
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CourseDao{
     @Transaction
     @Query("SELECT * FROM mylist_courses")
-    fun getCourses(): LiveData<List<DBCourseWithInstructor>>
+    fun getCourses(): Flow<List<DBCourseWithInstructor>>
 
     @Transaction
     @Query("SELECT * FROM mylist_courses WHERE id = :id")
-    fun getCourseByID(id:Int):LiveData<DBCourseWithInstructor?>
+    fun getCourseByID(id:Int):Flow<DBCourseWithInstructor?>
 
     @Query("SELECT * FROM DatabaseCourseNote WHERE mylistCourseId = :id")
-    fun getNotesByCourseId(id:Int):LiveData<List<DatabaseCourseNote?>>
+    fun getNotesByCourseId(id:Int):Flow<List<DatabaseCourseNote?>>
 
 
     @Insert
@@ -44,23 +45,30 @@ interface CourseDao{
     fun deleteCourseNote(Note: DatabaseCourseNote)
 }
 
-@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class],version=1)
+@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class],version=1, exportSchema = false)
 abstract class CourseDatabase:RoomDatabase(){
-    abstract val courseDao:CourseDao
-}
+    abstract fun courseDao():CourseDao
 
-private lateinit var INSTANCE: CourseDatabase
+    companion object{
+        @Volatile
+        private  var INSTANCE: CourseDatabase? =null
 
-fun getDatabase(context: Context): CourseDatabase {
-    if (!::INSTANCE.isInitialized) {
-        synchronized(CourseDatabase::class.java)
-        {
-            INSTANCE = Room.databaseBuilder(
-                context.applicationContext,
-                CourseDatabase::class.java,
-                "courses"
-            ).build()
+        fun getDatabase(context: Context): CourseDatabase {
+            return INSTANCE ?: synchronized(this)
+                {
+                    val instance = Room.databaseBuilder(
+                        context,
+                        CourseDatabase::class.java,
+                        "courses"
+                    ).build()
+                    INSTANCE=instance
+                    instance
+                }
+
         }
+
     }
-    return INSTANCE
 }
+
+
+

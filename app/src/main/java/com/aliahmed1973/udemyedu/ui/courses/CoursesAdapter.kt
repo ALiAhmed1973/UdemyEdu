@@ -1,17 +1,15 @@
-package com.aliahmed1973.udemyedu.courses
+package com.aliahmed1973.udemyedu.ui.courses
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.aliahmed1973.udemyedu.databinding.CourseItemBinding
 import com.aliahmed1973.udemyedu.model.Course
 
 private const val TAG = "CoursesAdapter"
-class CoursesAdapter(val courseClickListener:CourseClickListener):ListAdapter<Course,CoursesAdapter.CourseViewHolder>(DiffCallback) {
+class CoursesAdapter(val courseClickListener:CourseClickListener):PagingDataAdapter<Course,CoursesAdapter.CourseViewHolder>(DiffCallback) {
 
     object DiffCallback :DiffUtil.ItemCallback<Course>(){
         override fun areItemsTheSame(oldItem: Course, newItem: Course): Boolean {
@@ -49,7 +47,7 @@ class CoursesAdapter(val courseClickListener:CourseClickListener):ListAdapter<Co
 
     override fun onBindViewHolder(holder: CoursesAdapter.CourseViewHolder, position: Int) {
         val course = getItem(position)
-        holder.bind(course)
+        course?.let { holder.bind(it) }
     }
 
     class CourseClickListener(val listenerFun:(Course)->Unit){

@@ -6,13 +6,13 @@
     <data>
         <variable
             name="viewModel"
-            type="com.aliahmed1973.udemyedu.mylist.MyCoursesListViewModel" />
+            type="com.aliahmed1973.udemyedu.ui.mylist.MyCoursesListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".mylist.MyCoursesListFragment">
+        tools:context=".ui.mylist.MyCoursesListFragment">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_mylist"

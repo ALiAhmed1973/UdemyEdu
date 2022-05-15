@@ -1,4 +1,4 @@
-package com.aliahmed1973.udemyedu.mylist
+package com.aliahmed1973.udemyedu.ui.mylist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
