@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.aliahmed1973.udemyedu.CourseApp
 import com.aliahmed1973.udemyedu.databinding.CoursesFragmentBinding
+import com.aliahmed1973.udemyedu.ui.CoursesLoadStateAdapter
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -44,9 +45,13 @@ class CoursesFragment : Fragment() {
             )
         })
 
+
         binding.apply {
             rvCourses.setHasFixedSize(true)
-            rvCourses.adapter = adapter
+            rvCourses.adapter = adapter.withLoadStateHeaderAndFooter(
+                header = CoursesLoadStateAdapter{adapter.retry()},
+                footer = CoursesLoadStateAdapter{adapter.retry()}
+            )
         }
 
 
