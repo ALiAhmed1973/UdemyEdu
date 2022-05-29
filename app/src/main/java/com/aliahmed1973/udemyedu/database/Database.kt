@@ -2,6 +2,7 @@ package com.aliahmed1973.udemyedu.database
 
 import android.content.Context
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.aliahmed1973.udemyedu.model.Course
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +11,11 @@ import kotlinx.coroutines.flow.Flow
 interface CourseDao{
     @Transaction
     @Query("SELECT * FROM mylist_courses")
-    fun getCourses(): Flow<List<DBCourseWithInstructor>>
+    fun getFavoritesCourses(): Flow<List<DBCourseWithInstructor>>
+
+    @Transaction
+    @Query("SELECT * FROM mylist_courses")
+    fun getCourses(): PagingSource<Int,DBCourseWithInstructor>
 
     @Transaction
     @Query("SELECT * FROM mylist_courses WHERE id = :id")
@@ -23,7 +28,13 @@ interface CourseDao{
     @Insert
     fun insertCourse(course: DatabaseMylistCourse)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllCourses(course: List<DatabaseMylistCourse>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAllInstructors(courseInstructors: List<DatabaseCourseInstructor>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertCourseInstructor(CourseInstructor: DatabaseCourseInstructor)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -43,11 +54,19 @@ interface CourseDao{
 
     @Delete
     fun deleteCourseNote(Note: DatabaseCourseNote)
+
+    @Query("DELETE FROM mylist_courses")
+    suspend fun clearCourses()
+//    @Query("DELETE FROM DatabaseCourseNote")
+//    suspend fun clearCoursesNotes()
+    @Query("DELETE FROM course_instructor")
+    suspend fun clearCourseInstructor()
 }
 
-@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class],version=1, exportSchema = false)
+@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class,RemoteKeys::class],version=1, exportSchema = false)
 abstract class CourseDatabase:RoomDatabase(){
     abstract fun courseDao():CourseDao
+    abstract fun remoteKeysDao():RemoteKeysDao
 
     companion object{
         @Volatile

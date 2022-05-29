@@ -72,8 +72,10 @@ dependencies {
     implementation("io.coil-kt:coil:1.4.0")
     //Room
     implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
     implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-paging:2.5.0-alpha01"
     //paging
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 

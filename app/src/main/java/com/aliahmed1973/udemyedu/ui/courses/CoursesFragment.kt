@@ -13,7 +13,9 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.paging.map
 import com.aliahmed1973.udemyedu.CourseApp
+import com.aliahmed1973.udemyedu.database.asCourseModel
 import com.aliahmed1973.udemyedu.databinding.CoursesFragmentBinding
 import com.aliahmed1973.udemyedu.ui.CoursesLoadStateAdapter
 import kotlinx.coroutines.flow.collectLatest
@@ -63,28 +65,25 @@ class CoursesFragment : Fragment() {
         adapter.addLoadStateListener {
             loadState->
             binding.apply {
-                progressBar.isVisible = loadState.source.refresh is LoadState.Loading
-                rvCourses.isVisible = loadState.source.refresh is LoadState.NotLoading
-                retryButton.isVisible = loadState.source.refresh is LoadState.Error
+                progressBar.isVisible = loadState.source.refresh is LoadState.Loading ||loadState.mediator?.refresh is LoadState.Loading
+                rvCourses.isVisible =  loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
+                retryButton.isVisible = loadState.source.refresh is LoadState.Error ||  loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
 
-                if(loadState.source.refresh is LoadState.NotLoading &&
-                    loadState.append.endOfPaginationReached &&
-                    adapter.itemCount < 1)
-                {
-                    rvCourses.isVisible=false
-                    emptyList.isVisible=true
-                }else
-                {
-                    emptyList.isVisible=false
-                }
+                val isListEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
+
+                emptyList.isVisible = isListEmpty
 
             }
         }
 
+
+
         lifecycleScope.launch {
             coursesViewModel.courses.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest {
-                    adapter.submitData(it)
+                    adapter.submitData(it.map {
+                        db->db.asCourseModel()
+                    })
                     Log.d(TAG, "onViewCreated: ${it}")
                 }
         }

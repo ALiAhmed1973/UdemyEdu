@@ -29,7 +29,6 @@ class CoursesAdapter(val courseClickListener:CourseClickListener):PagingDataAdap
         {
             itemCourse=course
             binding.course=course
-           binding.executePendingBindings()
         }
         init {
             binding.cardViewCourse.setOnClickListener {

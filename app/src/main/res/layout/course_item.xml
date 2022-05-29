@@ -82,7 +82,7 @@
                 android:id="@+id/tv_instructor_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{course.instructor.get(0).name}"
+                android:text="@{course.instructor[0].name}"
                 android:textSize="10sp"
                 android:textColor="@color/primaryTextColor"
                 app:layout_constraintBottom_toBottomOf="parent"

@@ -13,5 +13,5 @@ class CourseApp:Application() {
 
     private val courseService = CourseApi.service
 
-    val repository by lazy { CourseRepository(courseDatabase.courseDao(),courseService) }
+    val repository by lazy { CourseRepository(courseDatabase,courseService) }
 }

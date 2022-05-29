@@ -9,7 +9,7 @@ import java.util.*
 
 @Entity(tableName = "mylist_courses")
 data class DatabaseMylistCourse(
-    @PrimaryKey val id: Int,
+     val id: Int,
 
     @ColumnInfo(name = "title") val title: String,
 
@@ -25,16 +25,20 @@ data class DatabaseMylistCourse(
 
     @ColumnInfo(name = "headline") val headLine: String,
 
-    @ColumnInfo(name = "is_added") val isAdded: Boolean
+    @ColumnInfo(name = "is_added") val isAdded: Boolean,
+
+     @PrimaryKey @ColumnInfo(name = "tracking_id")
+     val  trackingId:String
+
 )
 
-@Entity
+@Entity(tableName = "course_instructor")
 data class DatabaseCourseInstructor(
+    @PrimaryKey(autoGenerate = true) val id: Int=0,
     val name: String,
     @ColumnInfo(name = "jop_title") val jopTitle: String,
-    @PrimaryKey
     @ColumnInfo(name = "instructor_image") val instructorImage: String,
-    @ColumnInfo(name = "instructor_url") val url: String,
+     @ColumnInfo(name = "instructor_url") val url: String,
     val mylistId: Int
 )
 
@@ -73,7 +77,8 @@ fun Course.asDatabaseCourse(): DatabaseMylistCourse {
         courseImage = courseImage,
         publishedTitle = publishedTitle,
         headLine = headLine,
-        isAdded = isAddedToMylist
+        isAdded = isAddedToMylist,
+        trackingId = trackingId
     )
 
 }
@@ -111,7 +116,8 @@ fun List<DBCourseWithInstructor>.asCourseModel(): List<Course> {
             headLine = it.mylistCourse.headLine,
             instructor = instructors,
             courseNote = notes,
-            isAddedToMylist = it.mylistCourse.isAdded
+            isAddedToMylist = it.mylistCourse.isAdded,
+            trackingId = it.mylistCourse.trackingId
         )
     }
 }
@@ -138,7 +144,8 @@ fun DBCourseWithInstructor.asCourseModel(): Course {
         headLine = mylistCourse.headLine,
         instructor = instructors,
         courseNote = courseNotes,
-        isAddedToMylist = mylistCourse.isAdded
+        isAddedToMylist = mylistCourse.isAdded,
+        trackingId = mylistCourse.trackingId
     )
 }
 

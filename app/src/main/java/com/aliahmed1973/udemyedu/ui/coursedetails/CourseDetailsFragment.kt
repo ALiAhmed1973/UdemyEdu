@@ -42,11 +42,7 @@ class CourseDetailsFragment : Fragment() {
         viewModel.checkCourseInDatabase(course)
        
         binding.rvCourseReviews.adapter =adapter
-        lifecycleScope.launch {
-            launch {  viewModel.courseReview.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collectLatest {
-                    adapter.submitList(it)
-                } }
+        viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.databaseCourse.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                     .collectLatest {
@@ -54,10 +50,15 @@ class CourseDetailsFragment : Fragment() {
                         if (it != null) {
                             viewModel.setCourse(it)
                         } else {
-                            viewModel.setCourse(course.copy(isAddedToMylist = false))
+                            viewModel.setCourse(course)
                         }
                     }
             }
+
+            launch {  viewModel.courseReview.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
+                    adapter.submitList(it)
+                } }
         }
 
 

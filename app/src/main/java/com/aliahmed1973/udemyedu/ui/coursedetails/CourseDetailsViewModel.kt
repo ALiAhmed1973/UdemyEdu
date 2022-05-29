@@ -1,63 +1,75 @@
 package com.aliahmed1973.udemyedu.ui.coursedetails
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.aliahmed1973.udemyedu.data.CourseRepository
 import com.aliahmed1973.udemyedu.model.Course
 import com.aliahmed1973.udemyedu.model.Review
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val TAG = "CourseDetailsViewModel"
 
 
 class CourseDetailsViewModel(private val repository: CourseRepository) : ViewModel() {
 
-    private val _courseDetails = MutableLiveData<Course>()
-    val courseDetails: LiveData<Course>
-        get() = _courseDetails
+    private val _courseDetails = MutableStateFlow<Course?>(null)
+    val courseDetails = _courseDetails.asStateFlow().stateIn(scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null)
 
     private var _courseId = MutableStateFlow(0)
 
 
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
+    val courseReview: StateFlow<List<Review>> = _courseId.flatMapLatest {
+        repository.getCourseReviewFromServer(it)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    val courseReview: Flow<List<Review>> = _courseId.flatMapLatest {
-           repository.getCourseReviewFromServer(it)
-    }
-
-
-    @kotlinx.coroutines.ExperimentalCoroutinesApi
-    val databaseCourse: Flow<Course?> = _courseId.flatMapLatest {
+    val databaseCourse: StateFlow<Course?> = _courseId.flatMapLatest {
         repository.getMyCourseById(it)
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
 
     fun checkCourseInDatabase(course: Course) {
-        viewModelScope.launch {
-            _courseId.emit(course.id)
-        }
+        _courseId.value = course.id
     }
 
 
-    fun setCourse(course: Course) {
-        _courseDetails.postValue(course)
+     fun setCourse(course: Course) {
+        _courseDetails.value=course
     }
 
     fun addOrRemoveCourseFromList() {
-        Log.d(TAG, "setCourseDetails: " + courseDetails.value)
         viewModelScope.launch {
-            _courseDetails.value?.let {
-                if (it.isAddedToMylist) {
-                    repository.deleteCourseFromList(it)
-                } else {
-                    it.isAddedToMylist = true
-                    repository.insertCourseToMylist(it)
-                    repository.insertCourseInstructorToMylist(it)
+            _courseDetails.collectLatest {
+                it?.let {
+                    if (it.isAddedToMylist) {
+                        it.isAddedToMylist = false
+                        repository.deleteCourseFromList(it)
+                    } else {
+                        Log.d(TAG, "addOrRemoveCourseFromList: $it")
+                        repository.insertCourseToMylist(it)
+                        repository.insertCourseInstructorToMylist(it)
+                        it.isAddedToMylist = true
+                    }
                 }
             }
+
         }
     }
 

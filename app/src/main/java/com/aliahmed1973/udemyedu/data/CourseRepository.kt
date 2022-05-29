@@ -1,6 +1,7 @@
 package com.aliahmed1973.udemyedu.data
 
 import android.util.Log
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -19,18 +20,20 @@ import kotlinx.coroutines.withContext
 private const val TAG = "CourseRepository"
 
 class CourseRepository(
-    private val courseDao: CourseDao,
+    private val db: CourseDatabase,
     private val service: Service,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
-    fun getCoursesFromServer(): Flow<PagingData<Course>> {
+    @OptIn(ExperimentalPagingApi::class)
+    fun getAllCourses(): Flow<PagingData<DBCourseWithInstructor>> {
         return Pager(config = PagingConfig(
-            pageSize = NETWORK_PAGE_SIZE,
-            maxSize = 100,
-            enablePlaceholders = false
+            pageSize = NETWORK_PAGE_SIZE
+        , enablePlaceholders = false,
+            maxSize = 100
         ),
-            pagingSourceFactory = { CoursePagingSource(service) }).flow
+            remoteMediator = CourseRemoteMediator(service,db),
+            pagingSourceFactory = { db.courseDao().getCourses()}).flow
     }
 
     suspend fun getCourseReviewFromServer(courseId: Int): Flow<List<Review>> {
@@ -52,8 +55,8 @@ class CourseRepository(
         withContext(coroutineDispatcher)
         {
             try {
-                courseDao.insertCourse(course.asDatabaseCourse())
-                courseDao.insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
+                db.courseDao().insertCourse(course.asDatabaseCourse())
+                db.courseDao().insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
             } catch (e: Exception) {
                 Log.e(TAG, "insertCourseToMylist: ${e.message}")
             }
@@ -65,7 +68,7 @@ class CourseRepository(
         withContext(coroutineDispatcher)
         {
             try {
-                courseDao.insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
+                db.courseDao().insertCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
             } catch (e: Exception) {
                 Log.e(TAG, "insertCourseInstructorToMylist: ${e.message}")
             }
@@ -77,7 +80,7 @@ class CourseRepository(
         withContext(coroutineDispatcher)
         {
             try {
-                courseDao.insertCourseNote(courseNote.asDBNote(courseId))
+                db.courseDao().insertCourseNote(courseNote.asDBNote(courseId))
             } catch (e: Exception) {
                 Log.e(TAG, "insertNotesToCourse: ${e.message}")
             }
@@ -88,7 +91,7 @@ class CourseRepository(
         withContext(coroutineDispatcher)
         {
             try {
-                courseDao.updateCourseNote(courseNote.asDBNote(courseId))
+                db.courseDao().updateCourseNote(courseNote.asDBNote(courseId))
             } catch (e: Exception) {
                 Log.e(TAG, "insertNotesToCourse: ${e.message}")
             }
@@ -96,19 +99,19 @@ class CourseRepository(
     }
 
     fun getMyCourseslist(): Flow<List<Course>> {
-        return courseDao.getCourses().map {
+        return db.courseDao().getFavoritesCourses().map {
             it.asCourseModel()
         }
     }
 
     fun getMyCourseById(id: Int): Flow<Course?> {
-        return courseDao.getCourseByID(id).map {
+        return db.courseDao().getCourseByID(id).map {
             it?.asCourseModel()
         }
     }
 
     fun getNotesById(id: Int): Flow<List<CourseNote?>?> {
-        return courseDao.getNotesByCourseId(id).map {
+        return db.courseDao().getNotesByCourseId(id).map {
             it.asNotesModel()
         }
     }
@@ -118,11 +121,11 @@ class CourseRepository(
         withContext(coroutineDispatcher)
         {
             try {
-                courseDao.deleteCourse(course.asDatabaseCourse())
-                courseDao.deleteCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
+                db.courseDao().deleteCourse(course.asDatabaseCourse())
+                db.courseDao().deleteCourseInstructor(course.instructor[0].asDBCourseInstructor(course.id))
                 course.courseNote?.asDBNotes(course.id)
                     ?.let {
-                        courseDao.deleteCourseNotes(it)
+                        db.courseDao().deleteCourseNotes(it)
                     }
             } catch (e: Exception) {
                 Log.e(TAG, "deleteCourseFromList: ${e.message}")
@@ -135,7 +138,7 @@ class CourseRepository(
         withContext(coroutineDispatcher)
         {
             try {
-                courseDao.deleteCourseNote(courseNote.asDBNote(courseId))
+                db.courseDao().deleteCourseNote(courseNote.asDBNote(courseId))
             } catch (e: Exception) {
                 Log.e(TAG, "deleteNoteFromList: ${e.message}")
             }

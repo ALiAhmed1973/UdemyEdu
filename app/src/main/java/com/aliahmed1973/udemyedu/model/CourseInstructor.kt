@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class CourseInstructor(
+data class CourseInstructor(
     val name: String,
     val jopTitle: String,
     val instructorImage: String,

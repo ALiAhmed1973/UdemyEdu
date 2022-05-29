@@ -11,7 +11,7 @@ private const val TAG = "CoursesViewModel"
 class CoursesViewModel(private val courseRepository: CourseRepository) : ViewModel() {
 
 
-    val courses = courseRepository.getCoursesFromServer().cachedIn(viewModelScope)
+    val courses = courseRepository.getAllCourses().cachedIn(viewModelScope)
 
 
     @Suppress("UNCHECKED_CAST")

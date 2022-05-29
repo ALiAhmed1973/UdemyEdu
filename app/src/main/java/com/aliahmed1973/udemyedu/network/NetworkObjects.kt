@@ -1,5 +1,7 @@
 package com.aliahmed1973.udemyedu.network
 
+import com.aliahmed1973.udemyedu.database.DBCourseWithInstructor
+import com.aliahmed1973.udemyedu.database.DatabaseMylistCourse
 import com.aliahmed1973.udemyedu.model.Course
 import com.aliahmed1973.udemyedu.model.CourseInstructor
 import com.squareup.moshi.Json
@@ -38,12 +40,13 @@ data class NetworkCourse(
     @Json(name = "headline")
     val headLine: String,
     @Json(name = "visible_instructors")
-    val instructor: List<NetworkCourseInstructor>
+    val instructor: List<NetworkCourseInstructor>,
+    @Json(name = "tracking_id")
+    val trackingId:String
 )
 
 fun NetworkCoursesContainer.asCourseModel(): List<Course> {
     return courses.map {
-
         Course(
             id = it.id, title = it.title, url = it.url,
             isPaid = it.isPaid, price = it.price, courseImage = it.courseImage,
@@ -53,7 +56,21 @@ fun NetworkCoursesContainer.asCourseModel(): List<Course> {
                 CourseInstructor(name = it.name, jopTitle = it.jopTitle?:"", instructorImage = it.instructorImage, url = it.url)
             },
             courseNote = null,
-            isAddedToMylist = false
+            isAddedToMylist = false,
+            trackingId = it.trackingId
+        )
+    }
+}
+
+fun NetworkCoursesContainer.asDBCourses(): List<DatabaseMylistCourse> {
+    return courses.map {
+        DatabaseMylistCourse(
+            id = it.id, title = it.title, url = it.url,
+            isPaid = it.isPaid, price = it.price, courseImage = it.courseImage,
+            publishedTitle = it.publishedTitle,
+            headLine = it.headLine,
+            isAdded = false,
+            trackingId = it.trackingId
         )
     }
 }

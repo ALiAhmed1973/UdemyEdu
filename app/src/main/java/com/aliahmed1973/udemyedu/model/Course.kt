@@ -25,5 +25,7 @@ data class Course(
 
     val courseNote:List<CourseNote?>?,
 
-    var isAddedToMylist:Boolean
+    var isAddedToMylist:Boolean,
+
+    val trackingId:String
 ) : Parcelable
