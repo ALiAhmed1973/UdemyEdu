@@ -5,9 +5,9 @@ import kotlinx.parcelize.Parcelize
 
 
 @Parcelize
-class Review (
+data class Review (
 
-    val id:Int?,
+    val id:Long,
 
     val content:String,
 

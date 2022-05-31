@@ -22,31 +22,28 @@ class CourseDetailsViewModel(private val repository: CourseRepository) : ViewMod
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null)
 
-    private var _courseId = MutableStateFlow(0)
+    private val _courseId = MutableStateFlow(0)
 
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    val courseReview: StateFlow<List<Review>> = _courseId.flatMapLatest {
-        repository.getCourseReviewFromServer(it)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    val courseReview = _courseId.flatMapLatest {
+        repository.getCourseReviews(it)
+    }
 
 
     @kotlinx.coroutines.ExperimentalCoroutinesApi
-    val databaseCourse: StateFlow<Course?> = _courseId.flatMapLatest {
-        repository.getMyCourseById(it)
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = null
-    )
+//    val databaseCourse: StateFlow<Course?> = _courseId.flatMapLatest {
+//        repository.getMyCourseById(it)
+//    }.stateIn(
+//        scope = viewModelScope,
+//        started = SharingStarted.WhileSubscribed(5000),
+//        initialValue = null
+//    )
 
 
     fun checkCourseInDatabase(course: Course) {
         _courseId.value = course.id
+        setCourse(course)
     }
 
 

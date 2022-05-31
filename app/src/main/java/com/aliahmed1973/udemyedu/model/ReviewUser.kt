@@ -7,6 +7,4 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class ReviewUser (
 
-    val id:Int?,
-
     val name:String):Parcelable

@@ -1,9 +1,7 @@
 package com.aliahmed1973.udemyedu.database
 
 import androidx.room.*
-import com.aliahmed1973.udemyedu.model.Course
-import com.aliahmed1973.udemyedu.model.CourseInstructor
-import com.aliahmed1973.udemyedu.model.CourseNote
+import com.aliahmed1973.udemyedu.model.*
 import java.util.*
 
 
@@ -65,7 +63,25 @@ data class DBCourseWithInstructor(
 //    @Embedded val mylistCourse: DatabaseMylistCourse,
 //
 //)
+@Entity(tableName = "reviews")
+data class DBReview (
 
+    @PrimaryKey(autoGenerate = true)
+    val dbId: Int=0,
+
+    val id:Long,
+
+    val content:String,
+
+    val rating:Float,
+
+    val createdTime:String,
+
+    @Embedded
+    val reviewUser: ReviewUser,
+
+    val courseid: Int
+)
 
 fun Course.asDatabaseCourse(): DatabaseMylistCourse {
     return DatabaseMylistCourse(
@@ -169,5 +185,10 @@ fun List<CourseNote?>.asDBNotes(courseid: Int): List<DatabaseCourseNote?> {
 
 fun CourseNote.asDBNote(courseid: Int):DatabaseCourseNote {
     return DatabaseCourseNote(id=id,noteText = noteText, mylistCourseId = courseid)
+}
+
+fun DBReview.asReviewModel():Review
+{
+    return Review(id=id,content=content, rating = rating,createdTime=createdTime, reviewUser=reviewUser)
 }
 

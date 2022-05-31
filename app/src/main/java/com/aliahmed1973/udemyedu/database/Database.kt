@@ -1,28 +1,29 @@
 package com.aliahmed1973.udemyedu.database
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
 import androidx.room.*
-import com.aliahmed1973.udemyedu.model.Course
+import com.aliahmed1973.udemyedu.database.review.RemoteReviewKeys
+import com.aliahmed1973.udemyedu.database.review.RemoteReviewKeysDao
+import com.aliahmed1973.udemyedu.database.review.ReviewDao
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface CourseDao{
+interface CourseDao {
     @Transaction
     @Query("SELECT * FROM mylist_courses")
     fun getFavoritesCourses(): Flow<List<DBCourseWithInstructor>>
 
     @Transaction
     @Query("SELECT * FROM mylist_courses")
-    fun getCourses(): PagingSource<Int,DBCourseWithInstructor>
+    fun getCourses(): PagingSource<Int, DBCourseWithInstructor>
 
     @Transaction
     @Query("SELECT * FROM mylist_courses WHERE id = :id")
-    fun getCourseByID(id:Int):Flow<DBCourseWithInstructor?>
+    fun getCourseByID(id: Int): Flow<DBCourseWithInstructor?>
 
     @Query("SELECT * FROM DatabaseCourseNote WHERE mylistCourseId = :id")
-    fun getNotesByCourseId(id:Int):Flow<List<DatabaseCourseNote?>>
+    fun getNotesByCourseId(id: Int): Flow<List<DatabaseCourseNote?>>
 
 
     @Insert
@@ -57,32 +58,40 @@ interface CourseDao{
 
     @Query("DELETE FROM mylist_courses")
     suspend fun clearCourses()
-//    @Query("DELETE FROM DatabaseCourseNote")
+
+    //    @Query("DELETE FROM DatabaseCourseNote")
 //    suspend fun clearCoursesNotes()
     @Query("DELETE FROM course_instructor")
     suspend fun clearCourseInstructor()
 }
 
-@Database(entities = [DatabaseMylistCourse::class,DatabaseCourseInstructor::class,DatabaseCourseNote::class,RemoteKeys::class],version=1, exportSchema = false)
-abstract class CourseDatabase:RoomDatabase(){
-    abstract fun courseDao():CourseDao
-    abstract fun remoteKeysDao():RemoteKeysDao
+@Database(
+    entities = [DatabaseMylistCourse::class, DatabaseCourseInstructor::class,
+        DatabaseCourseNote::class, RemoteKeys::class,DBReview::class,RemoteReviewKeys::class],
+    version = 1,
+    exportSchema = false
+)
+abstract class CourseDatabase : RoomDatabase() {
+    abstract fun courseDao(): CourseDao
+    abstract fun reviewDao(): ReviewDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
+    abstract fun remoteReviewKeysDao(): RemoteReviewKeysDao
 
-    companion object{
+    companion object {
         @Volatile
-        private  var INSTANCE: CourseDatabase? =null
+        private var INSTANCE: CourseDatabase? = null
 
         fun getDatabase(context: Context): CourseDatabase {
             return INSTANCE ?: synchronized(this)
-                {
-                    val instance = Room.databaseBuilder(
-                        context,
-                        CourseDatabase::class.java,
-                        "courses"
-                    ).build()
-                    INSTANCE=instance
-                    instance
-                }
+            {
+                val instance = Room.databaseBuilder(
+                    context,
+                    CourseDatabase::class.java,
+                    "courses"
+                ).build()
+                INSTANCE = instance
+                instance
+            }
 
         }
 

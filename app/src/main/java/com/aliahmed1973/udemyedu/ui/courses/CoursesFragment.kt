@@ -1,7 +1,6 @@
 package com.aliahmed1973.udemyedu.ui.courses
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,14 +61,17 @@ class CoursesFragment : Fragment() {
             }
         }
 
-        adapter.addLoadStateListener {
-            loadState->
+        adapter.addLoadStateListener { loadState ->
             binding.apply {
-                progressBar.isVisible = loadState.source.refresh is LoadState.Loading ||loadState.mediator?.refresh is LoadState.Loading
-                rvCourses.isVisible =  loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
-                retryButton.isVisible = loadState.source.refresh is LoadState.Error ||  loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
+                progressBar.isVisible =
+                    loadState.source.refresh is LoadState.Loading || loadState.mediator?.refresh is LoadState.Loading
+                rvCourses.isVisible =
+                    loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
+                retryButton.isVisible =
+                    loadState.source.refresh is LoadState.Error || loadState.mediator?.refresh is LoadState.Error && adapter.itemCount == 0
 
-                val isListEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
+                val isListEmpty =
+                    loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
 
                 emptyList.isVisible = isListEmpty
 
@@ -79,14 +81,20 @@ class CoursesFragment : Fragment() {
 
 
         lifecycleScope.launch {
-            coursesViewModel.courses.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collectLatest {
-                    adapter.submitData(it.map {
-                        db->db.asCourseModel()
-                    })
-                    Log.d(TAG, "onViewCreated: ${it}")
-                }
+
+            launch {
+                coursesViewModel.courses.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                    .collectLatest {
+                        adapter.submitData(it.map { db ->
+                            db.asCourseModel()
+                        })
+
+                    }
+            }
+
+
         }
+
 
     }
 

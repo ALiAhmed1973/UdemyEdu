@@ -1,5 +1,6 @@
 package com.aliahmed1973.udemyedu.network
 
+import com.aliahmed1973.udemyedu.database.DBReview
 import com.aliahmed1973.udemyedu.model.Review
 import com.aliahmed1973.udemyedu.model.ReviewUser
 import com.squareup.moshi.Json
@@ -9,15 +10,13 @@ data class NetworkReviewContainer(@Json(name = "results") val reviews: List<Netw
 
 @JsonClass(generateAdapter = true)
 data class NetworkReviewUser(
-    @Json(name = "id")
-    val id:Int?,
     @Json(name = "display_name")
     val name:String)
 
 @JsonClass(generateAdapter = true)
 data class NetworkReviews (
     @Json(name = "id")
-    val id:Int?,
+    val id:Long,
     @Json(name = "content")
     val content:String,
     @Json(name = "rating")
@@ -30,8 +29,15 @@ data class NetworkReviews (
 
 fun NetworkReviewContainer.asReviewModel():List<Review>{
     return reviews.map {
-        val reviewUser = ReviewUser(id=it.reviewUser.id, name = it.reviewUser.name)
+        val reviewUser = ReviewUser( name = it.reviewUser.name)
         Review(id =it.id, content = it.content, rating = it.rating, createdTime = it.createdTime,reviewUser=reviewUser)
+    }
+}
+
+fun NetworkReviewContainer.asDBreview(courseId:Int):List<DBReview>{
+    return reviews.map {
+        val reviewUser = ReviewUser( name = it.reviewUser.name)
+        DBReview(id =it.id, content = it.content, rating = it.rating, createdTime = it.createdTime,reviewUser=reviewUser, courseid = courseId)
     }
 }
 

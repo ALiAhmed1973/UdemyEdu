@@ -3,13 +3,15 @@ package com.aliahmed1973.udemyedu.ui.coursedetails
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.PagerAdapter
 import com.aliahmed1973.udemyedu.databinding.ReviewItemBinding
 import com.aliahmed1973.udemyedu.model.Review
 
-class ReviewAdapter:ListAdapter<Review,ReviewAdapter.ReviewViewHolder>(DiffCallback) {
+class ReviewAdapter:PagingDataAdapter<Review,ReviewAdapter.ReviewViewHolder>(DiffCallback) {
 
 
     object DiffCallback : DiffUtil.ItemCallback<Review>(){

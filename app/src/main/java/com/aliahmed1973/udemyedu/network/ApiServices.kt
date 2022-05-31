@@ -28,7 +28,7 @@ interface Service{
         "Authorization: Basic "+BuildConfig.Authorization_Key,
         "Content-Type: application/json;charset=utf-8")
     @GET("courses/{course_id}/reviews")
-   suspend fun getReviews(@Path("course_id") course_id:Int):NetworkReviewContainer
+   suspend fun getReviews(@Path("course_id") course_id:Int,@Query("page") page: Int,@Query("page_size") pageSize:Int):NetworkReviewContainer
 }
 
 object CourseApi{

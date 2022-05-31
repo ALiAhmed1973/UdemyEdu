@@ -12,8 +12,12 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.withStateAtLeast
 import androidx.navigation.fragment.navArgs
+import androidx.paging.map
 import com.aliahmed1973.udemyedu.CourseApp
+import com.aliahmed1973.udemyedu.database.asCourseModel
+import com.aliahmed1973.udemyedu.database.asReviewModel
 import com.aliahmed1973.udemyedu.databinding.CourseDetailsFragmentBinding
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -36,6 +40,8 @@ class CourseDetailsFragment : Fragment() {
         return binding.root
     }
 
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter  = ReviewAdapter()
         val course = args.courseDetails
@@ -43,21 +49,23 @@ class CourseDetailsFragment : Fragment() {
        
         binding.rvCourseReviews.adapter =adapter
         viewLifecycleOwner.lifecycleScope.launch {
-            launch {
-                viewModel.databaseCourse.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                    .collectLatest {
-                        Log.d(TAG, "onViewCreated: $it")
-                        if (it != null) {
-                            viewModel.setCourse(it)
-                        } else {
-                            viewModel.setCourse(course)
-                        }
-                    }
-            }
+//            launch {
+//                viewModel.databaseCourse.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+//                    .collectLatest {
+//                        Log.d(TAG, "onViewCreated: $it")
+//                        if (it != null) {
+//                            viewModel.setCourse(it)
+//                        } else {
+//                            viewModel.setCourse(course)
+//                        }
+//                    }
+//            }
 
             launch {  viewModel.courseReview.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest {
-                    adapter.submitList(it)
+                    adapter.submitData(it.map { db ->
+                        db.asReviewModel()
+                    })
                 } }
         }
 

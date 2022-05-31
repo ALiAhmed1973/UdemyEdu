@@ -10,22 +10,25 @@ import com.aliahmed1973.udemyedu.database.*
 import com.aliahmed1973.udemyedu.model.Course
 import com.aliahmed1973.udemyedu.model.CourseNote
 import com.aliahmed1973.udemyedu.model.Review
+import com.aliahmed1973.udemyedu.network.NetworkReviewContainer
 import com.aliahmed1973.udemyedu.network.Service
 import com.aliahmed1973.udemyedu.network.asReviewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import kotlin.math.log
 
 private const val TAG = "CourseRepository"
 
+@OptIn(ExperimentalPagingApi::class)
 class CourseRepository(
     private val db: CourseDatabase,
     private val service: Service,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
 
-    @OptIn(ExperimentalPagingApi::class)
+
     fun getAllCourses(): Flow<PagingData<DBCourseWithInstructor>> {
         return Pager(config = PagingConfig(
             pageSize = NETWORK_PAGE_SIZE
@@ -36,20 +39,17 @@ class CourseRepository(
             pagingSourceFactory = { db.courseDao().getCourses()}).flow
     }
 
-    suspend fun getCourseReviewFromServer(courseId: Int): Flow<List<Review>> {
-        return try {
-            val networkResponse = service.getReviews(courseId)
-            Log.d(TAG, "getCourseReviewFromServer: " + "${networkResponse}")
-            withContext(coroutineDispatcher) {
-                flow {
-                    emit(  networkResponse.asReviewModel())
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "getCourseReviewFromServer: " + e.message)
-            flowOf()
-        }
+
+     fun getCourseReviews(courseId: Int): Flow<PagingData<DBReview>> {
+        return Pager(config = PagingConfig(
+            pageSize = NETWORK_PAGE_SIZE
+            , enablePlaceholders = false,
+            maxSize = 100
+        ),
+            remoteMediator = ReviewRemoteMediator(courseId,service,db),
+            pagingSourceFactory = { db.reviewDao().getReviews(courseId)}).flow
     }
+
 
     suspend fun insertCourseToMylist(course: Course) {
         withContext(coroutineDispatcher)
